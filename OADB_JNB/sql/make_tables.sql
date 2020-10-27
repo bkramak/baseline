@@ -4,12 +4,22 @@
  unlicensed and unwarranted
  create OADB tables
 */
-DROP TABLE IF EXISTS public.type;
-DROP TABLE IF EXISTS public.asset_type CASCADE;
-DROP TABLE IF EXISTS public.asset CASCADE;
-DROP TABLE IF EXISTS public.facility CASCADE;
 
-CREATE TABLE public.type(
+CREATE SCHEMA IF NOT EXISTS sandbox;  -- for importing raw data
+CREATE SCHEMA IF NOT EXISTS bl;       -- baseline for the main tables
+CREATE SCHEMA IF NOT EXISTS ats;      -- for time series asset data - event logs, 10min, hr data
+CREATE SCHEMA IF NOT EXISTS rts;      -- for resource time series data - met mast, merra2, era5
+CREATE SCHEMA IF NOT EXISTS maint;    -- for maintenance record type data
+CREATE SCHEMA IF NOT EXISTS inv;      -- for inventory management
+CREATE SCHEMA IF NOT EXISTS mgmt;      -- monthly/annual summary data for reports
+
+
+DROP TABLE IF EXISTS bl.type;
+DROP TABLE IF EXISTS bl.asset_type CASCADE;
+DROP TABLE IF EXISTS bl.asset CASCADE;
+DROP TABLE IF EXISTS bl.facility CASCADE;
+
+CREATE TABLE bl.type(
 	tid bigserial not null primary key,
 	name varchar(50) not null,
 	description varchar(250) not null
@@ -26,7 +36,7 @@ INSERT INTO type(name, description) values('modeled resmeas', 'MERRA-2, ERA-5, W
 
 
 
-CREATE TABLE public.asset_type(
+CREATE TABLE bl.asset_type(
 	atid bigserial not null primary key,
 	tid bigint not null,
 	name varchar(50) not null,
@@ -39,7 +49,7 @@ INSERT INTO asset_type(tid,name,description) values(1,'Repower MM82', '2000kW tu
 
 
 
-CREATE TABLE public.facility (
+CREATE TABLE bl.facility (
 	fid bigserial not null primary key,
 	parent_fid bigint,
 	shortname varchar(20) not null,
@@ -65,7 +75,7 @@ INSERT INTO facility(shortname,longname,akaname,capacity_mw_ac,description,latit
 
 
 
-CREATE TABLE public.asset(
+CREATE TABLE bl.asset(
 	aid bigserial not null primary key,
 	fid bigint not null,
 	atid bigint not null,
